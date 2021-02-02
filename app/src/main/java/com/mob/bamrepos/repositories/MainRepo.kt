@@ -1,6 +1,8 @@
 package com.mob.bamrepos.repositories
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.mob.bamrepos.models.response.Repo
 import com.mob.bamrepos.network.ApiService
 import retrofit2.Call
@@ -13,12 +15,16 @@ class MainRepo @Inject constructor(
 ) {
 
     private val TAG = "BAMRepos"
+    private val _dataResponseLD = MutableLiveData<List<Repo>>()
+
+    val dataResponseLD: LiveData<List<Repo>>
+        get() = _dataResponseLD
 
     fun getRepos() {
         val call = apiService.getRepos()
         call.enqueue(object : Callback<List<Repo>> {
             override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
-                Log.e(TAG, "onResponse: " + response.body())
+                _dataResponseLD.postValue(response.body())
             }
 
             override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
